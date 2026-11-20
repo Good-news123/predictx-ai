@@ -1113,6 +1113,552 @@ async function verifyPaymentCallback() {
 }
 
 
+/* ==================================
+   INITIALIZE APPLICATION
+================================== */
+
+loadPrices();
+
+loadAccount();
+
+veri  Subscribe
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="notice">
+
+        Weekly access expires after 7 days.
+
+        Monthly access expires after 30 days.
+
+        Lifetime access does not expire.
+
+        Payments are verified securely before VIP
+        access is granted.
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- BOTTOM NAVIGATION -->
+
+<nav>
+
+    <button class="active"
+        data-page="home"
+        onclick="showPage('home')">
+
+        <b>⌂</b>
+        Home
+
+    </button>
+
+    <button
+        data-page="free"
+        onclick="showPage('free')">
+
+        <b>⚽</b>
+        Free Tips
+
+    </button>
+
+    <button
+        data-page="standings"
+        onclick="showPage('standings')">
+
+        <b>▤</b>
+        Standings
+
+    </button>
+
+    <button
+        data-page="vip"
+        onclick="showPage('vip')">
+
+        <b>♛</b>
+        VIP
+
+    </button>
+
+    <button
+        data-page="premium"
+        onclick="showPage('premium')">
+
+        <b>✦</b>
+        Premium
+
+    </button>
+
+</nav>
+
+
+<script>
+
+/* ==================================
+   PREDICTX CONFIGURATION
+================================== */
+
+const CONFIG = {
+
+    whatsappChannel:
+    "https://whatsapp.com/channel/REPLACE_WITH_CHANNEL_ID",
+
+    adminNumber:
+    "234XXXXXXXXXX"
+
+};
+
+document.getElementById("channelLink").href =
+    CONFIG.whatsappChannel;
+
+document.getElementById("adminLink").href =
+    "https://wa.me/" + CONFIG.adminNumber;
+
+
+/* ==================================
+   GLOBAL VARIABLES
+================================== */
+
+let token = localStorage.getItem("px_token");
+
+let accountData = null;
+
+
+/* ==================================
+   API HELPER
+================================== */
+
+async function api(endpoint, options = {}) {
+
+    const headers = {
+        "Content-Type": "application/json"
+    };
+
+    if (token) {
+        headers.Authorization = "Bearer " + token;
+    }
+
+    const response = await fetch(endpoint, {
+        ...options,
+        headers
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || "Request failed");
+    }
+
+    return data;
+
+}
+
+
+/* ==================================
+   PAGE NAVIGATION
+================================== */
+
+function showPage(page) {
+
+    document.querySelectorAll(".page")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    document.getElementById(page)
+        .classList.add("active");
+
+    document.querySelectorAll("nav button")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.page === page
+            );
+
+        });
+
+    window.scrollTo(0, 0);
+
+    if (page === "vip") {
+        loadAccount();
+    }
+
+}
+
+
+/* ==================================
+   FREE TIPS CATEGORY
+================================== */
+
+function showFreeType(type, button) {
+
+    document.getElementById("overSection")
+        .classList.toggle("hidden", type !== "over");
+
+    document.getElementById("winSection")
+        .classList.toggle("hidden", type !== "win");
+
+    document.querySelectorAll("#free .tab")
+        .forEach(tab => tab.classList.remove("active"));
+
+    button.classList.add("active");
+
+}
+
+
+/* ==================================
+   REGISTER AND LOGIN
+================================== */
+
+async function account(mode) {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("message");
+
+    message.textContent = "Please wait...";
+
+    try {
+
+        const data = await api(
+            "/api/auth/" + mode,
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+        token = data.token;
+
+        localStorage.setItem("px_token", token);
+
+        message.textContent = "Account successfully connected.";
+
+        await loadAccount();
+
+    } catch(error) {
+
+        message.textContent = error.message;
+
+    }
+
+}
+
+
+/* ==================================
+   LOAD ACCOUNT
+================================== */
+
+async function loadAccount() {
+
+    if (!token) {
+
+        accountData = null;
+
+        updateAccountUI();
+
+        document.getElementById("vipLocked")
+            .classList.remove("hidden");
+
+        document.getElementById("vipUnlocked")
+            .classList.add("hidden");
+
+        return;
+
+    }
+
+    try {
+
+        accountData = await api("/api/me");
+
+        updateAccountUI();
+
+        const subscription = accountData.subscription;
+
+        if (!subscription) {
+
+            document.getElementById("vipLocked")
+                .classList.remove("hidden");
+
+            document.getElementById("vipUnlocked")
+                .classList.add("hidden");
+
+            return;
+
+        }
+
+        document.getElementById("vipLocked")
+            .classList.add("hidden");
+
+        document.getElementById("vipUnlocked")
+            .classList.remove("hidden");
+
+        if (subscription.expires_at === null) {
+
+            document.getElementById("expiry")
+                .textContent = "Lifetime VIP Access";
+
+        } else {
+
+            document.getElementById("expiry")
+                .textContent =
+                "VIP access active. Expiry: " +
+                new Date(subscription.expires_at).toLocaleString();
+
+        }
+
+        const content = await api("/api/vip/content");
+
+        document.getElementById("vipContent")
+            .innerHTML = "";
+
+        content.tips.forEach(tip => {
+
+            const card = document.createElement("div");
+
+            const title = document.createElement("h3");
+            title.textContent = tip.title;
+
+            const message = document.createElement("p");
+            message.textContent = tip.message;
+
+            card.append(title, message);
+
+            document.getElementById("vipContent")
+                .appendChild(card);
+
+        });
+
+    } catch(error) {
+
+        document.getElementById("vipLocked")
+            .classList.remove("hidden");
+
+        document.getElementById("vipUnlocked")
+            .classList.add("hidden");
+
+    }
+
+}
+
+
+/* ==================================
+   UPDATE ACCOUNT UI
+================================== */
+
+function updateAccountUI() {
+
+    document.getElementById("signedOut")
+        .classList.toggle("hidden", !!accountData);
+
+    document.getElementById("signedIn")
+        .classList.toggle("hidden", !accountData);
+
+    if (accountData) {
+
+        document.getElementById("accountLabel")
+            .textContent =
+            "Signed in as " + accountData.email;
+
+    }
+
+}
+
+
+/* ==================================
+   LOGOUT
+================================== */
+
+function logout() {
+
+    token = null;
+
+    accountData = null;
+
+    localStorage.removeItem("px_token");
+
+    updateAccountUI();
+
+    loadAccount();
+
+    document.getElementById("message")
+        .textContent = "You have logged out.";
+
+}
+
+
+/* ==================================
+   LOAD PREMIUM PRICES
+================================== */
+
+async function loadPrices() {
+
+    try {
+
+        const data = await api("/api/config");
+
+        document.getElementById("weeklyPrice")
+            .textContent =
+            "₦" + Number(data.prices.weekly).toLocaleString();
+
+        document.getElementById("monthlyPrice")
+            .textContent =
+            "₦" + Number(data.prices.monthly).toLocaleString();
+
+        document.getElementById("lifetimePrice")
+            .textContent =
+            "₦" + Number(data.prices.lifetime).toLocaleString();
+
+    } catch(error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ==================================
+   PURCHASE PREMIUM
+================================== */
+
+async function buyPlan(plan) {
+
+    const message =
+        document.getElementById("message");
+
+    if (!token) {
+
+        message.textContent =
+            "Please create an account or login first.";
+
+        showPage("premium");
+
+        return;
+
+    }
+
+    try {
+
+        message.textContent =
+            "Connecting to Paystack...";
+
+        const data = await api(
+            "/api/payment/initialize",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    plan
+                })
+            }
+        );
+
+        window.location.href =
+            data.authorization_url;
+
+    } catch(error) {
+
+        message.textContent = error.message;
+
+    }
+
+}
+
+
+/* ==================================
+   VERIFY PAYMENT CALLBACK
+================================== */
+
+async function verifyPaymentCallback() {
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    if (params.get("payment") !== "callback") {
+        return;
+    }
+
+    const reference = params.get("reference");
+
+    showPage("premium");
+
+    const message =
+        document.getElementById("message");
+
+    if (!reference) {
+
+        message.textContent =
+            "Payment reference is missing.";
+
+        return;
+
+    }
+
+    if (!token) {
+
+        message.textContent =
+            "Please log into the same account used to make payment.";
+
+        return;
+
+    }
+
+    message.textContent =
+        "Verifying your payment...";
+
+    try {
+
+        await api(
+            "/api/payment/verify",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    reference
+                })
+            }
+        );
+
+        history.replaceState(
+            {},
+            document.title,
+            "/"
+        );
+
+        message.textContent =
+            "Payment successful! VIP access unlocked.";
+
+        showPage("vip");
+
+        await loadAccount();
+
+    } catch(error) {
+
+        message.textContent =
+            error.message;
+
+    }
+
+}
+
+
 /* =====================================
    INITIALIZE APPLICATION
 ===================================== */

@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050807">
+
+<title>PREDICTX AI</title>
+
+<style>
+:root {
+    --bg: #050807;
+    --card: #101713;
+    --green: #20df75;
+    --white: #ffffff;
+    --muted: #9aaca1;
+    --border: #24352b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--white);
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background: #080e0a;
+    border-bottom: 1px solid var(--border);
+    padding: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.logo span {
+    color: var(--green);
+}
+
+main {
+    max-width: 850px;
+    margin: auto;
+    padding: 18px 14px 100px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+h1 {
+    font-size: 28px;
+}
+
+h2 {
+    font-size: 21px;
+}
+
+p {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 15px;
+    font-weight: bold;
+    background: var(--green);
+    color: #041109;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.secondary {
+    background: #17251c;
+    color: var(--green);
+    border: 1px solid #286641;
+}
+
+.hero {
+    background:
+        radial-gradient(circle at top right, #145b34, transparent 45%),
+        var(--card);
+
+    padding: 24px;
+    border-radius: 17px;
+    border: 1px solid #1d5033;
+}
+
+.green {
+    color: var(--green);
+}
+
+.actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding: 13px 8px;
+    border-radius: 9px;
+    font-weight: bold;
+    background: var(--green);
+    color: #041109;
+}
+
+.btn.secondary {
+    background: #17251c;
+    color: var(--green);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 17px;
+    margin: 12px 0;
+}
+
+.tabs {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.tab {
+    background: #17251c;
+    color: white;
+}
+
+.tab.active {
+    background: var(--green);
+    color: black;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    margin: 8px 0 14px;
+    background: #080e0a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: white;
+}
+
+label {
+    color: #c6d4ca;
+    font-size: 13px;
+}
+
+.price {
+    font-size: 28px;
+    font-weight: 900;
+    margin: 12px 0;
+}
+
+.tag {
+    color: var(--green);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.notice {
+    background: #102017;
+    border-left: 3px solid var(--green);
+    padding: 12px;
+    font-size: 13px;
+    color: #c2d3c8;
+    margin: 15px 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.status {
+    color: var(--green);
+    font-weight: bold;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #080e0a;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 2px;
+    z-index: 20;
+}
+
+nav button {
+    flex: 1;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 7px 2px;
+}
+
+nav button.active {
+    color: var(--green);
+}
+
+nav b {
+    display: block;
+    font-size: 19px;
+    margin-bottom: 4px;
+}
+
+@media(min-width:650px) {
+    nav {
+        max-width: 850px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 12px 12px 0 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        PREDICT<span>X</span> AI
+    </div>
+
+    <span class="tag">AI FOOTBALL INSIGHTS</span>
+</header>
+
+<main>
+
+<!-- HOME -->
+
+<section id="home" class="page active">
+
+    <div class="hero">
+
+        <span class="tag">SMARTER FOOTBALL INSIGHTS</span>
+
+        <h1>
+            Welcome to
+            <span class="green">PREDICTX AI</span>
+        </h1>
+
+        <p>
+            Welcome to PREDICTX AI, your destination
+            for football predictions, match analysis,
+            standings and premium football insights.
+        </p>
+
+        <div class="actions">
+
+            <a class="btn" id="channelLink"
+               href="#" target="_blank">
+                Join WhatsApp Channel
+            </a>
+
+            <a class="btn secondary" id="adminLink"
+               href="#" target="_blank">
+                Contact Admin
+            </a>
+
+        </div>
+
+    </div>
+
+    <h2>Explore PREDICTX AI</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>⚽ Free Tips</h3>
+            <p>Explore our free football predictions.</p>
+            <button class="secondary"
+                onclick="showPage('free')">
+                View Tips
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>📊 Match Standings</h3>
+            <p>Follow league standings and team positions.</p>
+            <button class="secondary"
+                onclick="showPage('standings')">
+                View Standings
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>👑 VIP Predictions</h3>
+            <p>Access exclusive premium predictions.</p>
+            <button class="secondary"
+                onclick="showPage('vip')">
+                Enter VIP
+            </button>
+        </div>
+
+    </div>
+
+    <div class="notice">
+        Football predictions are not guaranteed outcomes.
+        Always bet responsibly.
+    </div>
+
+</section>
+
+
+<!-- FREE TIPS -->
+
+<section id="free" class="page">
+
+    <h1>Free Tips</h1>
+
+    <p>Select your preferred prediction category.</p>
+
+    <div class="tabs">
+
+        <button class="tab active"
+            onclick="showFreeType('over',this)">
+            Over / Under
+        </button>
+
+        <button class="tab"
+            onclick="showFreeType('win',this)">
+            Straight Win
+        </button>
+
+    </div>
+
+    <div id="overSection" class="card">
+
+        <h2>Over / Under Predictions</h2>
+
+        <div id="overTips">
+            <p>No predictions published yet.</p>
+        </div>
+
+    </div>
+
+    <div id="winSection" class="card hidden">
+
+        <h2>Straight Win Predictions</h2>
+
+        <div id="winTips">
+            <p>No predictions published yet.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- STANDINGS -->
+
+<section id="standings" class="page">
+
+    <h1>Match Standings</h1>
+
+    <p>Follow football league standings.</p>
+
+    <div class="card">
+
+        <h2>League Tables</h2>
+
+        <p>
+            League standings will appear here once
+            the football data API is connected.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- VIP -->
+
+<section id="vip" class="page">
+
+    <h1>VIP Predictions</h1>
+
+    <div id="vipLocked" class="card">
+
+        <h2>🔒 VIP Access Locked</h2>
+
+        <p>
+            You need an active Premium subscription
+            to access VIP predictions.
+        </p>
+
+        <button onclick="showPage('premium')">
+            Unlock VIP
+        </button>
+
+    </div>
+
+    <div id="vipUnlocked" class="hidden">
+
+        <div class="card">
+
+            <span class="tag">VIP ACCESS ACTIVE</span>
+
+            <h2>Welcome to VIP</h2>
+
+            <p id="expiry" class="status"></p>
+
+            <div id="vipContent">
+                Loading VIP predictions...
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PREMIUM -->
+
+<section id="premium" class="page">
+
+    <h1>Premium Membership</h1>
+
+    <p>
+        Choose a membership plan to unlock
+        exclusive VIP predictions.
+    </p>
+
+
+    <!-- ACCOUNT -->
+
+    <div class="card">
+
+        <h2>Your Account</h2>
+
+        <div id="signedOut">
+
+            <label>Email Address</label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+            >
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Minimum 8 characters"
+            >
+
+            <div class="actions">
+
+                <button onclick="account('register')">
+                    Create Account
+                </button>
+
+                <button class="secondary"
+                    onclick="account('login')">
+                    Login
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="signedIn" class="hidden">
+
+            <p id="accountLabel"></p>
+
+            <button class="secondary"
+                onclick="logout()">
+                Logout
+            </button>
+
+        </div>
+
+        <p id="message" class="muted"></p>
+
+    </div>
+
+
+    <!-- PLANS -->
+
+    <div class="grid">
+
+        <div class="card">
+
+            <span class="tag">7 DAYS</span>
+
+            <h2>Weekly Plan</h2>
+
+            <div class="price" id="weeklyPrice">
+                ₦—
+            </div>
+
+            <p>Seven days of VIP access.</p>
+
+            <button onclick="buyPlan('weekly')">
+                Subscribe
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <span class="tag">30 DAYS</span>
+
+            <h2>Monthly Plan</h2>
+
+            <div class="price" id="monthlyPrice">
+                ₦—
+            </div>
+
+            <p>Thirty days of VIP access.</p>
+
+            <button onclick="buyPlan('monthly')">
+                Subscribe
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <span class="tag">LIFETIME</span>
+
+            <h2>Lifetime Plan</h2>
+
+            <div class="price" id="lifetimePrice">
+                ₦—
+            </div>
+
+            <p>One payment for lifetime access.</p>
+
+            <button onclick="buyPlan('lifetime')">
+                Subscribe
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="notice">
+
+        Weekly access expires after 7 days.
+
+        Monthly access expires after 30 days.
+
+        Lifetime access does not expire.
+
+        Payments are verified securely before VIP
+        access is granted.
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- BOTTOM NAVIGATION -->
+
+<nav>
+
+    <button class="active"
+        data-page="home"
+        onclick="showPage('home')">
+
+        <b>⌂</b>
+        Home
+
+    </button>
+
+    <button
+        data-page="free"
+        onclick="showPage('free')">
+
+        <b>⚽</b>
+        Free Tips
+
+    </button>
+
+    <button
+        data-page="standings"
+        onclick="showPage('standings')">
+
+        <b>▤</b>
+        Standings
+
+    </button>
+
+    <button
+        data-page="vip"
+        onclick="showPage('vip')">
+
+        <b>♛</b>
+        VIP
+
+    </button>
+
+    <button
+        data-page="premium"
+        onclick="showPage('premium')">
+
+        <b>✦</b>
+        Premium
+
+    </button>
+
+</nav>
+
+
+<script>
+
+/* ==================================
+   PREDICTX CONFIGURATION
+================================== */
+
+const CONFIG = {
+
+    whatsappChannel:
+    "https://whatsapp.com/channel/REPLACE_WITH_CHANNEL_ID",
+
+    adminNumber:
+    "234XXXXXXXXXX"
+
+};
+
+document.getElementById("channelLink").href =
+    CONFIG.whatsappChannel;
+
+document.getElementById("adminLink").href =
+    "https://wa.me/" + CONFIG.adminNumber;
+
+
+/* ==================================
+   GLOBAL VARIABLES
+================================== */
+
+let token = localStorage.getItem("px_token");
+
+let accountData = null;
+
+
+/* ==================================
+   API HELPER
+================================== */
+
+async function api(endpoint, options = {}) {
+
+    const headers = {
+        "Content-Type": "application/json"
+    };
+
+    if (token) {
+        headers.Authorization = "Bearer " + token;
+    }
+
+    const response = await fetch(endpoint, {
+        ...options,
+        headers
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || "Request failed");
+    }
+
+    return data;
+
+}
+
+
+/* ==================================
+   PAGE NAVIGATION
+================================== */
+
+function showPage(page) {
+
+    document.querySelectorAll(".page")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    document.getElementById(page)
+        .classList.add("active");
+
+    document.querySelectorAll("nav button")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.page === page
+            );
+
+        });
+
+    window.scrollTo(0, 0);
+
+    if (page === "vip") {
+        loadAccount();
+    }
+
+}
+
+
+/* ==================================
+   FREE TIPS CATEGORY
+================================== */
+
+function showFreeType(type, button) {
+
+    document.getElementById("overSection")
+        .classList.toggle("hidden", type !== "over");
+
+    document.getElementById("winSection")
+        .classList.toggle("hidden", type !== "win");
+
+    document.querySelectorAll("#free .tab")
+        .forEach(tab => tab.classList.remove("active"));
+
+    button.classList.add("active");
+
+}
+
+
+/* ==================================
+   REGISTER AND LOGIN
+================================== */
+
+async function account(mode) {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("message");
+
+    message.textContent = "Please wait...";
+
+    try {
+
+        const data = await api(
+            "/api/auth/" + mode,
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+        token = data.token;
+
+        localStorage.setItem("px_token", token);
+
+        message.textContent = "Account successfully connected.";
+
+        await loadAccount();
+
+    } catch(error) {
+
+        message.textContent = error.message;
+
+    }
+
+}
+
+
+/* ==================================
+   LOAD ACCOUNT
+================================== */
+
+async function loadAccount() {
+
+    if (!token) {
+
+        accountData = null;
+
+        updateAccountUI();
+
+        document.getElementById("vipLocked")
+            .classList.remove("hidden");
+
+        document.getElementById("vipUnlocked")
+            .classList.add("hidden");
+
+        return;
+
+    }
+
+    try {
+
+        accountData = await api("/api/me");
+
+        updateAccountUI();
+
+        const subscription = accountData.subscription;
+
+        if (!subscription) {
+
+            document.getElementById("vipLocked")
+                .classList.remove("hidden");
+
+            document.getElementById("vipUnlocked")
+                .classList.add("hidden");
+
+            return;
+
+        }
+
+        document.getElementById("vipLocked")
+            .classList.add("hidden");
+
+        document.getElementById("vipUnlocked")
+            .classList.remove("hidden");
+
+        if (subscription.expires_at === null) {
+
+            document.getElementById("expiry")
+                .textContent = "Lifetime VIP Access";
+
+        } else {
+
+            document.getElementById("expiry")
+                .textContent =
+                "VIP access active. Expiry: " +
+                new Date(subscription.expires_at).toLocaleString();
+
+        }
+
+        const content = await api("/api/vip/content");
+
+        document.getElementById("vipContent")
+            .innerHTML = "";
+
+        content.tips.forEach(tip => {
+
+            const card = document.createElement("div");
+
+            const title = document.createElement("h3");
+            title.textContent = tip.title;
+
+            const message = document.createElement("p");
+            message.textContent = tip.message;
+
+            card.append(title, message);
+
+            document.getElementById("vipContent")
+                .appendChild(card);
+
+        });
+
+    } catch(error) {
+
+        document.getElementById("vipLocked")
+            .classList.remove("hidden");
+
+        document.getElementById("vipUnlocked")
+            .classList.add("hidden");
+
+    }
+
+}
+
+
+/* ==================================
+   UPDATE ACCOUNT UI
+================================== */
+
+function updateAccountUI() {
+
+    document.getElementById("signedOut")
+        .classList.toggle("hidden", !!accountData);
+
+    document.getElementById("signedIn")
+        .classList.toggle("hidden", !accountData);
+
+    if (accountData) {
+
+        document.getElementById("accountLabel")
+            .textContent =
+            "Signed in as " + accountData.email;
+
+    }
+
+}
+
+
+/* ==================================
+   LOGOUT
+================================== */
+
+function logout() {
+
+    token = null;
+
+    accountData = null;
+
+    localStorage.removeItem("px_token");
+
+    updateAccountUI();
+
+    loadAccount();
+
+    document.getElementById("message")
+        .textContent = "You have logged out.";
+
+}
+
+
+/* ==================================
+   LOAD PREMIUM PRICES
+================================== */
+
+async function loadPrices() {
+
+    try {
+
+        const data = await api("/api/config");
+
+        document.getElementById("weeklyPrice")
+            .textContent =
+            "₦" + Number(data.prices.weekly).toLocaleString();
+
+        document.getElementById("monthlyPrice")
+            .textContent =
+            "₦" + Number(data.prices.monthly).toLocaleString();
+
+        document.getElementById("lifetimePrice")
+            .textContent =
+            "₦" + Number(data.prices.lifetime).toLocaleString();
+
+    } catch(error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ==================================
+   PURCHASE PREMIUM
+================================== */
+
+async function buyPlan(plan) {
+
+    const message =
+        document.getElementById("message");
+
+    if (!token) {
+
+        message.textContent =
+            "Please create an account or login first.";
+
+        showPage("premium");
+
+        return;
+
+    }
+
+    try {
+
+        message.textContent =
+            "Connecting to Paystack...";
+
+        const data = await api(
+            "/api/payment/initialize",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    plan
+                })
+            }
+        );
+
+        window.location.href =
+            data.authorization_url;
+
+    } catch(error) {
+
+        message.textContent = error.message;
+
+    }
+
+}
+
+
+/* ==================================
+   VERIFY PAYMENT CALLBACK
+================================== */
+
+async function verifyPaymentCallback() {
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    if (params.get("payment") !== "callback") {
+        return;
+    }
+
+    const reference = params.get("reference");
+
+    showPage("premium");
+
+    const message =
+        document.getElementById("message");
+
+    if (!reference) {
+
+        message.textContent =
+            "Payment reference is missing.";
+
+        return;
+
+    }
+
+    if (!token) {
+
+        message.textContent =
+            "Please log into the same account used to make payment.";
+
+        return;
+
+    }
+
+    message.textContent =
+        "Verifying your payment...";
+
+    try {
+
+        await api(
+            "/api/payment/verify",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    reference
+                })
+            }
+        );
+
+        history.replaceState(
+            {},
+            document.title,
+            "/"
+        );
+
+        message.textContent =
+            "Payment successful! VIP access unlocked.";
+
+        showPage("vip");
+
+        await loadAccount();
+
+    } catch(error) {
+
+        message.textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* =====================================
+   INITIALIZE APPLICATION
+===================================== */
+
+loadPrices();
+
+loadAccount();
+
+verifyPaymentCallback();
+
+
+/* Refresh VIP status every minute */
+
+setInterval(() => {
+
+    if (
+        document.getElementById("vip")
+            .classList.contains("active")
+    ) {
+
+        loadAccount();
+
+    }
+
+}, 60000);
+
+</script>
+
+</body>
+</html>

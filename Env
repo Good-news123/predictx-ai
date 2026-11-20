@@ -1,0 +1,15 @@
+PORT=3000
+
+APP_URL=http://localhost:3000
+
+JWT_SECRET=replace_with_a_long_random_secret
+
+PAYSTACK_SECRET_KEY=sk_test_REPLACE_ME
+
+CURRENCY=NGN
+
+PRICE_WEEKLY_NGN=1500
+PRICE_MONTHLY_NGN=5000
+PRICE_LIFETIME_NGN=25000
+
+DB_FILE=./predictx.sqlite

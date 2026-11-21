@@ -992,16 +992,29 @@ function renderStandings() {
   });
 }
 
-// Initialize application
+
+// ============================================
+// INITIALIZE APPLICATION
+// ============================================
+
 async function initializeApplication() {
-  renderTips();
-  renderStandings();
-  await loadPrices();
-  await loadAccount();
-  await verifyPaymentCallback();
+    await loadPrices();
+    await loadAccount();
+
+    setDefaultFootballDates();
+
+    await loadFootballCompetitions();
+
+    await Promise.all([
+        loadFootballPredictions(),
+        loadFootballStandings()
+    ]);
+
+    await verifyPaymentCallback();
 }
 
 initializeApplication();
+
 </script>
 </body>
 </html>

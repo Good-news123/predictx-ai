@@ -221,9 +221,34 @@ footer {
   </div>
 </section>
 
+
 <section id="free" class="page">
   <h2>Free Football Tips</h2>
-  <p>Choose a prediction category.</p>
+  <p>Predictions generated from real football competition statistics.</p>
+
+  <label>Choose competition</label>
+  <select id="predictionCompetition"></select>
+
+  <label>From date</label>
+  <input type="date" id="predictionFrom">
+
+  <label>To date</label>
+  <input type="date" id="predictionTo">
+
+  <button class="btn primary" onclick="loadFootballPredictions()">
+    Load Matches
+  </button>
+
+  <div class="category">
+    <button class="active" data-category="over">Over / Under</button>
+    <button data-category="straight">Straight Win</button>
+    <button data-category="correct">Correct Score</button>
+  </div>
+
+  <div id="freeTips" class="tip-list">
+    <p>Loading football matches...</p>
+  </div>
+</section>
 
   <div class="category">
     <button class="active" data-category="over">Over / Under</button>

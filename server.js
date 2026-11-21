@@ -491,7 +491,7 @@ app.get("/api/football/standings", async (req, res) => {
             error: error.message
         });
     }
-}):
+});
 
 // Register
 app.post("/api/register", authLimiter, async (req, res) => {

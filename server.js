@@ -201,6 +201,298 @@ app.get("/api/config", (req, res) => {
     });
 });
 
+
+// ============================================
+// FOOTBALL-DATA.ORG INTEGRATION
+// ============================================
+
+const footballCache = new Map();
+const FOOTBALL_API = "https://api.football-data.org/v4";
+const FOOTBALL_CACHE_TIME = 15 * 60 * 1000;
+
+async function footballRequest(endpoint) {
+    if (!process.env.FOOTBALL_DATA_TOKEN) {
+        throw new Error("Football API token is not configured.");
+    }
+
+    const cached = footballCache.get(endpoint);
+
+    if (cached && Date.now() - cached.time < FOOTBALL_CACHE_TIME) {
+        return cached.data;
+    }
+
+    const response = await fetch(`${FOOTBALL_API}${endpoint}`, {
+        headers: {
+            "X-Auth-Token": process.env.FOOTBALL_DATA_TOKEN
+        },
+        signal: AbortSignal.timeout(12000)
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        const error = new Error(
+            data.message || `Football API error: ${response.status}`
+        );
+        error.status = response.status;
+        throw error;
+    }
+
+    footballCache.set(endpoint, {
+        time: Date.now(),
+        data
+    });
+
+    return data;
+}
+
+function validCompetition(code) {
+    return /^[A-Z0-9]{2,5}$/.test(code || "");
+}
+
+function validDate(value) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(value || "") &&
+        !Number.isNaN(Date.parse(value));
+}
+
+// Poisson probability calculation.
+function poisson(lambda, goals) {
+    let factorial = 1;
+
+    for (let i = 2; i <= goals; i++) {
+        factorial *= i;
+    }
+
+    return Math.exp(-lambda) * Math.pow(lambda, goals) / factorial;
+}
+
+function calculatePredictions(match, standingsData) {
+    const homeId = match.homeTeam?.id;
+    const awayId = match.awayTeam?.id;
+
+    const table = standingsData.standings?.find(
+        item => item.type === "TOTAL"
+    )?.table || [];
+
+    const home = table.find(row => row.team.id === homeId);
+    const away = table.find(row => row.team.id === awayId);
+
+    if (
+        !home || !away ||
+        home.playedGames < 3 ||
+        away.playedGames < 3
+    ) {
+        return {
+            available: false,
+            reason: "Not enough league statistics for a reliable estimate."
+        };
+    }
+
+    const homeAttack = home.goalsFor / home.playedGames;
+    const homeDefence = home.goalsAgainst / home.playedGames;
+
+    const awayAttack = away.goalsFor / away.playedGames;
+    const awayDefence = away.goalsAgainst / away.playedGames;
+
+    // Estimated goals, with a modest home advantage.
+    const expectedHome = Math.max(
+        0.15,
+        ((homeAttack + awayDefence) / 2) * 1.10
+    );
+
+    const expectedAway = Math.max(
+        0.15,
+        ((awayAttack + homeDefence) / 2) * 0.90
+    );
+
+    const homeProb = [];
+    const awayProb = [];
+
+    for (let i = 0; i <= 6; i++) {
+        homeProb[i] = poisson(expectedHome, i);
+        awayProb[i] = poisson(expectedAway, i);
+    }
+
+    let homeWin = 0;
+    let draw = 0;
+    let awayWin = 0;
+    let over25 = 0;
+    let btts = 0;
+    let bestScore = { score: "0-0", probability: -1 };
+
+    for (let h = 0; h <= 6; h++) {
+        for (let a = 0; a <= 6; a++) {
+            const probability = homeProb[h] * awayProb[a];
+
+            if (h > a) homeWin += probability;
+            else if (h === a) draw += probability;
+            else awayWin += probability;
+
+            if (h + a > 2) over25 += probability;
+            if (h > 0 && a > 0) btts += probability;
+
+            if (probability > bestScore.probability) {
+                bestScore = {
+                    score: `${h}-${a}`,
+                    probability
+                };
+            }
+        }
+    }
+
+    const percent = value =>
+        Math.round(value * 100);
+
+    return {
+        available: true,
+        expectedGoals: {
+            home: Number(expectedHome.toFixed(2)),
+            away: Number(expectedAway.toFixed(2))
+        },
+        markets: {
+            homeWin: percent(homeWin),
+            draw: percent(draw),
+            awayWin: percent(awayWin),
+            over15: percent(1 - poisson(expectedHome + expectedAway, 0)
+                - poisson(expectedHome + expectedAway, 1)),
+            over25: percent(over25),
+            under25: percent(1 - over25),
+            bothTeamsToScore: percent(btts)
+        },
+        correctScore: bestScore.score,
+        method: "League scoring statistics and Poisson estimates"
+    };
+}
+
+// Get available competitions.
+app.get("/api/football/competitions", async (req, res) => {
+    try {
+        const data = await footballRequest("/competitions");
+
+        res.json({
+            competitions: (data.competitions || []).map(item => ({
+                id: item.id,
+                name: item.name,
+                code: item.code,
+                area: item.area?.name,
+                plan: item.plan
+            }))
+        });
+    } catch (error) {
+        console.error("Competitions error:", error.message);
+        res.status(error.status || 502).json({
+            error: error.message
+        });
+    }
+});
+
+// Get fixtures and predictions for a competition.
+app.get("/api/football/predictions", async (req, res) => {
+    try {
+        const competition = String(req.query.competition || "PL");
+        const today = new Date().toISOString().slice(0, 10);
+
+        const dateFrom = req.query.dateFrom || today;
+
+        const defaultEnd = new Date(
+            Date.now() + 7 * 86400000
+        ).toISOString().slice(0, 10);
+
+        const dateTo = req.query.dateTo || defaultEnd;
+
+        if (!validCompetition(competition)) {
+            return res.status(400).json({
+                error: "Invalid competition code."
+            });
+        }
+
+        if (!validDate(dateFrom) || !validDate(dateTo) ||
+            dateFrom > dateTo) {
+            return res.status(400).json({
+                error: "Invalid date range."
+            });
+        }
+
+        const base = `/competitions/${competition}`;
+
+        const [matchesData, standingsData] = await Promise.all([
+            footballRequest(
+                `${base}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`
+            ),
+            footballRequest(`${base}/standings`)
+        ]);
+
+        const matches = (matchesData.matches || []).map(match => ({
+            id: match.id,
+            competition: match.competition?.name,
+            utcDate: match.utcDate,
+            status: match.status,
+            homeTeam: {
+                id: match.homeTeam?.id,
+                name: match.homeTeam?.name,
+                crest: match.homeTeam?.crest
+            },
+            awayTeam: {
+                id: match.awayTeam?.id,
+                name: match.awayTeam?.name,
+                crest: match.awayTeam?.crest
+            },
+            score: match.score?.fullTime || null,
+            prediction: match.status === "SCHEDULED"
+                ? calculatePredictions(match, standingsData)
+                : null
+        }));
+
+        res.json({
+            competition: competition,
+            dateFrom,
+            dateTo,
+            count: matches.length,
+            matches
+        });
+
+    } catch (error) {
+        console.error("Prediction error:", error.message);
+
+        res.status(error.status || 502).json({
+            error: error.message
+        });
+    }
+});
+
+// Get actual league standings.
+app.get("/api/football/standings", async (req, res) => {
+    try {
+        const competition = String(req.query.competition || "PL");
+
+        if (!validCompetition(competition)) {
+            return res.status(400).json({
+                error: "Invalid competition code."
+            });
+        }
+
+        const data = await footballRequest(
+            `/competitions/${competition}/standings`
+        );
+
+        const total = data.standings?.find(
+            item => item.type === "TOTAL"
+        );
+
+        res.json({
+            competition: data.competition,
+            table: total?.table || []
+        });
+
+    } catch (error) {
+        console.error("Standings error:", error.message);
+
+        res.status(error.status || 502).json({
+            error: error.message
+        });
+    }
+}):
+
 // Register
 app.post("/api/register", authLimiter, async (req, res) => {
     try {
